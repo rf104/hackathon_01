@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinGuard - Financial Dashboard</title>
+    <!-- MDB CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            height: 300px;
+        }
+        .transaction-card {
+            transition: transform 0.2s;
+        }
+        .transaction-card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-logout {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-logout:hover {
+            background-color: red !important;
+            border-color: red !important;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-shield-alt me-2"></i>FinGuard
+        </a>
+        <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
+                data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto gap-3 font-weight-bold">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-user me-2"></i>Aref</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-light btn-sm mt-1 btn-logout" onclick="logout()" style="background-color: brown; border-color: brown;">
+                        <i class="fas fa-sign-out-alt me-1"></i><b>Logout</b>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container-fluid mt-4">
+    <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-4">
+            <!-- Financial Overview -->
+            <div class="card shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-wallet me-2"></i>Financial Overview</h5>
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <div class="border rounded p-3 bg-success text-white">
+                                <h6>Total Balance</h6>
+                                <h3 id="totalBalance">$12,450</h3>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 bg-danger text-white">
+                                <h6>Monthly Expenses</h6>
+                                <h3 id="monthlyExpenses">$2,340</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Transaction -->
+            <div class="card mt-4 shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-exchange-alt me-2"></i>New Transaction</h5>
+                    <form id="transactionForm" onsubmit="handleTransaction(event)">
+                        <div class="form-outline mb-3">
+                            <input type="number" id="amount" class="form-control" required>
+                            <label class="form-label" for="amount">Amount ($)</label>
+                        </div>
+                        <div class="form-outline mb-3">
+                            <input type="text" id="recipient" class="form-control" required>
+                            <label class="form-label" for="recipient">Recipient</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Money
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-lg-4">
+            <!-- Recent Transactions -->
+            <div class="card shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-history me-2"></i>Recent Transactions</h5>
+                    <div id="transactionList" class="mt-3">
+                        <% if (transactionIds && transactionIds.length > 0) { %>
+                            <% transactionIds.forEach(function(transactionId) { %>
+                                <div class="transaction-card card mb-2">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="mb-0">Transaction ID: <%= transactionId %></h6>
+                                                <small class="text-muted">Details for transaction <%= transactionId %></small>
+                                            </div>
+                                            <div class="text-end">
+                                                <h5 class="text-success mb-0">
+                                                    <!-- Placeholder for transaction amount -->
+                                                    $0.00
+                                                </h5>
+                                                <span class="badge bg-success">Completed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p>No recent transactions found.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Suggestions -->
+            <div class="card mt-4 shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-robot me-2"></i>AI Suggestions</h5>
+                    <div id="aiSuggestions" class="mt-3">
+                        <!-- Suggestions will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Fraud Alerts -->
+            <div class="card shadow-3 bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-exclamation-triangle me-2"></i>Security Alerts</h5>
+                    <div id="fraudAlerts" class="mt-3">
+                        <!-- Alerts will be shown here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="card mt-4 shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-trophy me-2"></i>Top Savers</h5>
+                    <ul id="leaderboard" class="list-group list-group-flush">
+                        <!-- Leaderboard entries -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card shadow-3 mt-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line me-2"></i>Revenue Overview</h5>
+                    <canvas id="revenueChart" style="height: 200px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MDB JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Dummy Data
+    let transactions = [];
+    let balance = 12450;
+    let monthlyExpenses = 2340;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTransactions();
+        loadAIRecommendations();
+        loadLeaderboard();
+        initializeRevenueChart();
+    });
+
+    // Handle Transaction
+    function handleTransaction(e) {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('amount').value);
+        const recipient = document.getElementById('recipient').value;
+        
+        // Fraud Check
+        if(amount > 5000 || amount > balance * 0.8) {
+            showFraudAlert(amount, recipient);
+            return;
+        }
+
+        // Add Transaction
+        const transaction = {
+            id: Date.now(),
+            amount: amount,
+            recipient: recipient,
+            date: new Date().toLocaleString(),
+            status: 'Completed'
+        };
+
+        transactions.unshift(transaction);
+        updateBalance(-amount);
+        updateMonthlyExpenses(amount);
+        appendTransaction(transaction);
+        resetForm();
+    }
+
+    // Fraud Detection Alert
+    function showFraudAlert(amount, recipient) {
+        const alertHTML = `
+            <div class="alert alert-danger d-flex align-items-center">
+                <i class="fas fa-shield-alt me-3 fs-4"></i>
+                <div>
+                    <h6>Suspicious Transaction Blocked!</h6>
+                    <p class="mb-0">Attempt to send $${amount} to ${recipient} was blocked.</p>
+                </div>
+            </div>
+        `;
+        document.getElementById('fraudAlerts').innerHTML = alertHTML;
+    }
+
+    // Update UI Functions
+    function appendTransaction(transaction) {
+        const transactionHTML = `
+            <div class="transaction-card card mb-2">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-0">${transaction.recipient}</h6>
+                            <small class="text-muted">${transaction.date}</small>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="${transaction.amount > 0 ? 'text-success' : 'text-danger'} mb-0">
+                                $${Math.abs(transaction.amount)}
+                            </h5>
+                            <span class="badge bg-success">${transaction.status}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('transactionList').insertAdjacentHTML('afterbegin', transactionHTML);
+    }
+
+    function loadTransactions() {
+        // Load existing transactions
+    }
+
+    function updateBalance(amount) {
+        balance += amount;
+        document.getElementById('totalBalance').textContent = `$${balance.toFixed(2)}`;
+    }
+
+    function updateMonthlyExpenses(amount) {
+        monthlyExpenses += amount;
+        document.getElementById('monthlyExpenses').textContent = `$${monthlyExpenses.toFixed(2)}`;
+    }
+
+    function resetForm() {
+        document.getElementById('transactionForm').reset();
+    }
+
+    // AI Recommendations
+    function loadAIRecommendations() {
+        const suggestions = [
+            "Consider reducing dining out expenses by 15%",
+            "Your utility bills are 20% higher than average",
+            "You're on track to save $500 this month!"
+        ];
+
+        const suggestionsHTML = suggestions.map(text => `
+            <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-lightbulb me-3 text-primary"></i>
+                <p class="mb-0">${text}</p>
+            </div>
+        `).join('');
+
+        document.getElementById('aiSuggestions').innerHTML = suggestionsHTML;
+    }
+
+    // Leaderboard
+    function loadLeaderboard() {
+        const leaders = [
+            {name: "Aref", saved: 4500},
+            {name: "Hemal", saved: 3800},
+            {name: "Charlie", saved: 3200}
+        ];
+
+        const leaderboardHTML = leaders.map(user => `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                ${user.name}
+                <span class="badge bg-primary rounded-pill">$${user.saved}</span>
+            </li>
+        `).join('');
+
+        document.getElementById('leaderboard').innerHTML = leaderboardHTML;
+    }
+
+    // Logout
+    function logout() {
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/';
+            } else {
+                alert('Logout failed');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Chart Implementation
+    function initializeRevenueChart() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        
+        // Dummy data for the chart
+        const data = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Monthly Expenses',
+                data: [650, 590, 800, 810, 560, 550, 400],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                tension: 0.4
+            },
+            {
+                label: 'Monthly Income',
+                data: [1200, 1300, 1250, 1400, 1150, 1350, 1100],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                tension: 0.4
+            }]
+        };
+
+        // Chart configuration
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Financial Overview'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        // Create the chart
+        new Chart(ctx, config);
+    }
+</script>
+</body>
+</html>

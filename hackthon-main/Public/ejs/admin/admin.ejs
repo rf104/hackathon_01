@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | FinGuard</title>
+    <!-- MDB CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .data-table {
+            overflow-x: auto;
+        }
+        .metric-card {
+            transition: all 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .user-row {
+            cursor: pointer;
+        }
+        .banned-user {
+            background-color: #ffe6e6 !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Admin Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-shield-alt me-2"></i>
+            FinGuard Admin
+        </a>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Admin Content -->
+<div class="container-fluid mt-4">
+    <div class="row g-4">
+        <!-- Main Metrics -->
+        <div class="col-12">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card metric-card shadow-3 bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Users</h5>
+                            <h1 id="totalUsers">0</h1>
+                            <small class="opacity-75">Active: <span id="activeUsers">0</span></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card metric-card shadow-3 bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Revenue</h5>
+                            <h1>$<span id="totalRevenue">0</span></h1>
+                            <small class="opacity-75">Last 30 days</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card metric-card shadow-3 bg-warning text-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">Fraud Attempts</h5>
+                            <h1 id="fraudAttempts">0</h1>
+                            <small class="opacity-75">Today: <span id="todayFraud">0</span></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card metric-card shadow-3 bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Transactions</h5>
+                            <h1 id="totalTransactions">0</h1>
+                            <small class="opacity-75">Processed today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="col-lg-8">
+            <div class="card shadow-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0"><i class="fas fa-users-cog me-2"></i>User Management</h5>
+                        <div class="w-25">
+                            <input type="text" class="form-control" placeholder="Search users..." 
+                                   id="searchUsers" onkeyup="filterUsers()">
+                        </div>
+                    </div>
+                    
+                    <div class="data-table">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Transactions</th>
+                                    <th>IP Address</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTable">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fraud Monitoring -->
+        <div class="col-lg-4">
+            <div class="card shadow-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-shield-alt me-2"></i>Fraud Alerts</h5>
+                    <div id="fraudAlerts" class="mt-3">
+                        <!-- Fraud alerts will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-3 mt-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line me-2"></i>Revenue Overview</h5>
+                    <canvas id="revenueChart" style="height: 200px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MDB JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Dummy Data
+    let users = [
+        {id: 1, name: "John Doe", email: "john@example.com", transactions: 15, 
+         ip: "192.168.1.101", isBanned: false, lastLogin: "2023-09-20"},
+        {id: 2, name: "Alice Smith", email: "alice@example.com", transactions: 42, 
+         ip: "203.45.67.89", isBanned: true, lastLogin: "2023-09-19"},
+        {id: 3, name: "Bob Johnson", email: "bob@example.com", transactions: 28, 
+         ip: "98.76.54.32", isBanned: false, lastLogin: "2023-09-20"}
+    ];
+
+    let fraudAttempts = 12;
+    let totalRevenue = 15420;
+
+    // Initialize Admin Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers();
+        updateMetrics();
+        loadFraudAlerts();
+        initializeRevenueChart();
+    });
+
+    // Load Users Table
+    function loadUsers() {
+        const tbody = document.getElementById('userTable');
+        tbody.innerHTML = users.map(user => `
+            <tr class="user-row ${user.isBanned ? 'banned-user' : ''}" 
+                onclick="viewUserDetails(${user.id})">
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="ms-3">
+                            <h6 class="mb-0">${user.name}</h6>
+                            <small class="text-muted">${user.email}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>${user.transactions}</td>
+                <td>${user.ip}</td>
+                <td>
+                    <span class="badge ${user.isBanned ? 'bg-danger' : 'bg-success'}">
+                        ${user.isBanned ? 'Banned' : 'Active'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm ${user.isBanned ? 'btn-success' : 'btn-danger'}"
+                            onclick="toggleBan(${user.id}, event)">
+                        ${user.isBanned ? 'Unban' : 'Ban'}
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Toggle User Ban
+    function toggleBan(userId, event) {
+        event.stopPropagation();
+        const user = users.find(u => u.id === userId);
+        user.isBanned = !user.isBanned;
+        loadUsers();
+        updateMetrics();
+    }
+
+    // Update Metrics
+    function updateMetrics() {
+        document.getElementById('totalUsers').textContent = users.length;
+        document.getElementById('activeUsers').textContent = 
+            users.filter(u => !u.isBanned).length;
+        document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
+        document.getElementById('fraudAttempts').textContent = fraudAttempts;
+        document.getElementById('totalTransactions').textContent = 
+            users.reduce((sum, user) => sum + user.transactions, 0);
+    }
+
+    // Fraud Alerts
+    function loadFraudAlerts() {
+        const alerts = [
+            {type: 'high-risk', message: 'Multiple failed transactions from 192.168.1.101', time: '2h ago'},
+            {type: 'suspicious', message: 'Unusual login activity from Alice Smith', time: '5h ago'},
+            {type: 'blocked', message: 'Blocked transaction attempt ($15,000)', time: '1d ago'}
+        ];
+
+        document.getElementById('fraudAlerts').innerHTML = alerts.map(alert => `
+            <div class="alert ${getAlertClass(alert.type)} d-flex align-items-center mb-3">
+                <i class="fas ${getAlertIcon(alert.type)} me-3"></i>
+                <div class="w-100">
+                    <div class="d-flex justify-content-between">
+                        <small class="fw-bold">${alert.message}</small>
+                        <small class="opacity-75">${alert.time}</small>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function getAlertClass(type) {
+        return {
+            'high-risk': 'alert-danger',
+            'suspicious': 'alert-warning',
+            'blocked': 'alert-info'
+        }[type];
+    }
+
+    function getAlertIcon(type) {
+        return {
+            'high-risk': 'fa-exclamation-circle',
+            'suspicious': 'fa-user-secret',
+            'blocked': 'fa-shield-alt'
+        }[type];
+    }
+
+    // Revenue Chart
+    function initializeRevenueChart() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [12000, 13500, 14200, 14800, 15420, 16000],
+                    borderColor: '#3b71ca',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {display: false}
+                }
+            }
+        });
+    }
+
+    // Search Users
+    function filterUsers() {
+        const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+        const rows = document.querySelectorAll('#userTable tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    }
+
+    function viewUserDetails(userId) {
+        // Implement user detail view
+        alert('Viewing details for user ID: ' + userId);
+    }
+
+    function logout() {
+        window.location.href = '/login';
+    }
+</script>
+</body>
+</html>

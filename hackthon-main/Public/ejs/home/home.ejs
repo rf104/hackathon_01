@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinGuard</title>
+    <!-- MDB CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .hero-section {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        color: white;
+      }
+      .feature-image {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-radius: 15px;
+      }
+      .feature-image:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+      }
+      .nav-link {
+        transition: all 0.3s !important;
+      }
+      .footer-links a {
+        color: rgba(255, 255, 255, 0.75);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+      .footer-links a:hover {
+        color: white;
+      }
+      .scroll-animation {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s;
+      }
+      .scroll-animation.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="fas fa-shield-alt me-2"></i>FinGuard
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#features">Features</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="btn btn-outline-light ms-2"
+                href="<%= localhost %>/login"
+                >Login</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="display-4 fw-bold mb-4">
+              Protect Your Finances with AI-Powered Security
+            </h1>
+            <p class="lead mb-4">
+              Real-time fraud detection and intelligent financial management in
+              one powerful platform.
+            </p>
+            <div class="d-flex gap-3">
+              <a
+                href="<%= localhost %>/login"
+                class="btn btn-light btn-lg px-4"
+                >Get Start</a
+              >
+              <a href="#features" class="btn btn-outline-light btn-lg px-4"
+                >Learn More</a
+              >
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <img
+              src="http://localhost:3000/images/1.jpg"
+              alt="Financial Security"
+              class="img-fluid rounded-4 feature-image"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-5">
+      <!-- Features Section -->
+      <section id="features" class="container py-5 scroll-animation">
+        <div class="text-center mb-5">
+          <h2 class="display-5 fw-bold mb-3">Key Features</h2>
+          <p class="text-muted">
+            Everything you need for complete financial security
+          </p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-70 border-0 shadow">
+              <img
+                src="<%= localhost %>/images/5.svg"
+                class="card-img-top"
+                alt="Dashboard Feature"
+                style="height: 50%"
+              />
+              <div class="card-body">
+                <h4 class="card-title">Smart Dashboard</h4>
+                <p class="card-text">
+                  Real-time financial overview with interactive charts and
+                  AI-powered insights.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card h-70 border-0 shadow">
+              <img
+                src="http://localhost:3000/images/4.svg"
+                class="card-img-top"
+                alt="Security Feature"
+                style="height: 50%"
+              />
+              <div class="card-body">
+                <h4 class="card-title">Advanced Protection</h4>
+                <p class="card-text">
+                  Machine learning-powered fraud detection with real-time
+                  alerts.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Section -->
+      <section class="bg-light py-5 scroll-animation">
+        <div class="container">
+          <div class="row text-center g-4">
+            <div class="col-md-4">
+              <h3 class="display-4 text-primary">99.9%</h3>
+              <p class="text-muted">Fraud Detection Accuracy</p>
+            </div>
+            <div class="col-md-4">
+              <h3 class="display-4 text-primary">1M+</h3>
+              <p class="text-muted">Protected Transactions</p>
+            </div>
+            <div class="col-md-4">
+              <h3 class="display-4 text-primary">24/7</h3>
+              <p class="text-muted">Real-time Monitoring</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <h5 class="mb-3"><i class="fas fa-shield-alt me-2"></i>FinGuard</h5>
+            <p class="text-muted">
+              Empowering financial security through AI and machine learning
+              technologies.
+            </p>
+            <div class="d-flex gap-3">
+              <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+              <a href="#" class="text-white"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <h5 class="mb-3">Company</h5>
+            <ul class="list-unstyled footer-links">
+              <li class="mb-2"><a href="#">About Us</a></li>
+              <li class="mb-2"><a href="#">Careers</a></li>
+              <li class="mb-2"><a href="#">Blog</a></li>
+              <li class="mb-2"><a href="#">Partners</a></li>
+            </ul>
+          </div>
+          <div class="col-md-2">
+            <h5 class="mb-3">Legal</h5>
+            <ul class="list-unstyled footer-links">
+              <li class="mb-2"><a href="#">Privacy</a></li>
+              <li class="mb-2"><a href="#">Terms</a></li>
+              <li class="mb-2"><a href="#">Security</a></li>
+              <li class="mb-2"><a href="#">GDPR</a></li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h5 class="mb-3">Newsletter</h5>
+            <form>
+              <div class="input-group">
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="Enter your email"
+                />
+                <button class="btn btn-primary" type="button">Subscribe</button>
+              </div>
+              <small class="text-muted"
+                >We'll never share your email with anyone else.</small
+              >
+            </form>
+          </div>
+        </div>
+        <hr class="my-5" />
+        <div class="text-center text-muted">
+          © 2025 FinGuard. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <!-- MDB JavaScript -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"
+    ></script>
+    <script>
+      // Scroll animation
+      const scrollElements = document.querySelectorAll(".scroll-animation");
+
+      const elementInView = (el) => {
+        const elementTop = el.getBoundingClientRect().top;
+        return (
+          elementTop <=
+          (window.innerHeight || document.documentElement.clientHeight)
+        );
+      };
+
+      const displayScrollElement = (element) => {
+        element.classList.add("visible");
+      };
+
+      const handleScrollAnimation = () => {
+        scrollElements.forEach((el) => {
+          if (elementInView(el)) {
+            displayScrollElement(el);
+          }
+        });
+      };
+
+      window.addEventListener("scroll", () => {
+        handleScrollAnimation();
+      });
+
+      // Initialize scroll check
+      handleScrollAnimation();
+
+      // Smooth scroll for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute("href")).scrollIntoView({
+            behavior: "smooth",
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
